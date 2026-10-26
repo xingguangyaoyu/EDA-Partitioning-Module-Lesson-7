@@ -1,0 +1,72 @@
+{
+  "id": "module02-07-recursive-bisection",
+  "title": "Recursive bisection check",
+  "items": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "prompt": "Recursive bisection builds k parts by…",
+      "choices": [
+        "solving one k-way problem directly",
+        "repeatedly bipartitioning the largest part",
+        "sorting the nodes by degree",
+        "running KL once on the whole graph"
+      ],
+      "answer": 1,
+      "explain": "The loop splits the largest part with an ordinary bipartitioner until k parts exist."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "prompt": "On the tiny graph, after the first split ABC|DE, which part is split next?",
+      "choices": [
+        "DE, because it is on the right",
+        "ABC, because it is the largest part",
+        "Either one — the choice does not matter",
+        "Neither — a two-way cut already finished the job"
+      ],
+      "answer": 1,
+      "explain": "Largest-part-first keeps sizes close; ABC has three nodes, DE has two."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "prompt": "Why does the cut go from 8 (k=3) to 13 (k=4)?",
+      "choices": [
+        "Because k=4 always doubles the cut",
+        "Because splitting DE cuts the weight-5 edge D–E",
+        "Because the graph gained a node",
+        "Because balance was ignored"
+      ],
+      "answer": 1,
+      "explain": "The last split separates D and E, so the heaviest edge (weight 5) joins the cut."
+    },
+    {
+      "id": "q4",
+      "type": "true_false",
+      "prompt": "More parts always means a lower total cut.",
+      "answer": false,
+      "explain": "On the tiny graph k=3 gives 8 and k=4 gives 13; more parts cost more cut here."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "prompt": "Which answer is a complete, valid partition result?",
+      "choices": [
+        "cut 6, parts AB|CDE, sizes 2 and 3",
+        "cut 6, parts AB|CDE, sizes not reported",
+        "cut 6, sizes 1 and 4",
+        "cut 6, parts AB|CDE, one pinned node moved"
+      ],
+      "answer": 0,
+      "explain": "A result needs the assignment, the part sizes and the cut together; a missing size, a 1-vs-4 split, or a moved pinned node does not count."
+    },
+    {
+      "id": "q6",
+      "type": "true_false",
+      "prompt": "Recursive bisection is greedy: a good early cut can leave a later split with no good options.",
+      "answer": true,
+      "explain": "Each split is locally good; the k=4 case shows the later split paying for the heavy D–E edge."
+    }
+  ]
+}

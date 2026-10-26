@@ -1,0 +1,247 @@
+1
+00:00:00,042 --> 00:00:04,595
+This is lab seven of partitioning for EDA: recursive bisection.
+
+2
+00:00:05,148 --> 00:00:07,800
+You already know how to cut a graph in two.
+
+3
+00:00:08,351 --> 00:00:12,292
+This lesson turns that one cut into as many parts as you need.
+
+4
+00:00:12,831 --> 00:00:16,797
+The same cutter, used again on smaller and smaller pieces.
+
+5
+00:00:17,466 --> 00:00:19,336
+Start with the situation.
+
+6
+00:00:19,877 --> 00:00:25,172
+Your bipartitioner works: spectral, Kernighan-Lin, or Fiduccia-Mattheyses.
+
+7
+00:00:25,710 --> 00:00:28,857
+It hands you one clean cut, and you trust it.
+
+8
+00:00:29,408 --> 00:00:34,755
+Now the floorplan needs four regions, and each region has to be a connected block.
+
+9
+00:00:35,294 --> 00:00:40,289
+A true four-way method means new code, new tuning, and new ways to be wrong.
+
+10
+00:00:40,841 --> 00:00:46,943
+Recursive bisection avoids all of that, because it reuses the two-way cutter you already have.
+
+11
+00:00:47,610 --> 00:00:50,861
+The algorithm is one loop, and the loop is short.
+
+12
+00:00:51,414 --> 00:00:55,042
+While you have fewer than k parts, take the largest part.
+
+13
+00:00:55,594 --> 00:01:00,954
+Run your bipartitioner on that part alone, and replace it with the two halves it returns.
+
+14
+00:01:01,492 --> 00:01:08,532
+Two details carry the method: always split the largest part, and never cut across parts you have already finished.
+
+15
+00:01:09,070 --> 00:01:15,042
+Splitting the largest part keeps the sizes close, and close sizes are what balance means here.
+
+16
+00:01:15,714 --> 00:01:19,173
+Let us run it on a graph small enough to check by hand.
+
+17
+00:01:19,727 --> 00:01:23,068
+Five nodes, A to E, with weighted edges.
+
+18
+00:01:23,607 --> 00:01:30,152
+The heavy edges are A to B with weight five, B to C with weight four, and D to E, also five.
+
+19
+00:01:30,703 --> 00:01:36,180
+The light edges are A to C and C to E, weight one each, and C to D, weight two.
+
+20
+00:01:36,732 --> 00:01:43,120
+Cut is the total weight of edges whose ends land in different parts, and today the target is four parts.
+
+21
+00:01:43,794 --> 00:01:46,420
+The first split happens on the whole graph.
+
+22
+00:01:46,960 --> 00:01:52,867
+The bipartitioner puts A, B, and C on one side, and D and E on the other.
+
+23
+00:01:53,419 --> 00:01:58,714
+Only two edges cross: C to D, weight two, and C to E, weight one.
+
+24
+00:01:59,265 --> 00:02:00,914
+So the cut is three.
+
+25
+00:02:01,465 --> 00:02:05,797
+That is two parts, and we asked for four, so the loop continues.
+
+26
+00:02:06,450 --> 00:02:08,972
+Next, we take the largest part.
+
+27
+00:02:09,525 --> 00:02:13,166
+A B C holds three nodes, and D E holds two.
+
+28
+00:02:13,705 --> 00:02:18,179
+So A B C is the part we split, and the split happens inside it only.
+
+29
+00:02:18,718 --> 00:02:23,909
+A and B share the weight-five edge, so they stay together, and C goes its own way.
+
+30
+00:02:24,460 --> 00:02:29,507
+Now the parts are A B, C, and D E, and the cut rises to eight.
+
+31
+00:02:30,162 --> 00:02:32,462
+Three parts, one more to go.
+
+32
+00:02:33,003 --> 00:02:36,605
+The largest remaining part is D E, so we split it.
+
+33
+00:02:37,156 --> 00:02:41,709
+This is where it hurts: D and E are joined by an edge of weight five.
+
+34
+00:02:42,261 --> 00:02:47,204
+Separating them adds that five to the cut, which brings the total to thirteen.
+
+35
+00:02:47,742 --> 00:02:51,592
+Four parts: A B, C, D, and E.
+
+36
+00:02:52,266 --> 00:02:56,077
+Before you run it yourself, know what to read on the lab panel.
+
+37
+00:02:56,617 --> 00:03:03,214
+The parts string groups the nodes: A B, then C, then D E, and the bars are the boundaries.
+
+38
+00:03:03,766 --> 00:03:07,120
+The cut number is the total weight across every boundary.
+
+39
+00:03:07,672 --> 00:03:13,357
+The history lists each split in order, so you can see which part was chosen and what it became.
+
+40
+00:03:13,896 --> 00:03:20,493
+If your numbers disagree with the ones on the panel, open the history: the first split is usually where it went wrong.
+
+41
+00:03:21,162 --> 00:03:22,928
+Compare the three cuts.
+
+42
+00:03:23,469 --> 00:03:26,186
+Stopping at three parts gives a cut of eight.
+
+43
+00:03:26,737 --> 00:03:32,891
+Going on to four parts costs thirteen, because the last split cuts the heaviest edge in the graph.
+
+44
+00:03:33,430 --> 00:03:36,134
+More parts is not automatically better.
+
+45
+00:03:36,672 --> 00:03:45,001
+Recursive bisection is greedy: every split looks good on its own, but an early decision can leave the next one with no good options.
+
+46
+00:03:45,642 --> 00:03:48,033
+Three traps to watch when you run it.
+
+47
+00:03:48,587 --> 00:03:52,697
+Trap one: a cheap cut is not automatically a good partition.
+
+48
+00:03:53,248 --> 00:03:58,009
+One node on one side and four on the other can look cheap and still be useless.
+
+49
+00:03:58,561 --> 00:04:05,301
+Trap two: report the total cut and the part sizes together, because either number alone tells half the story.
+
+50
+00:04:05,839 --> 00:04:14,507
+Trap three: if a node is pinned to a side, the split has to respect that, so a lower cut that moves a pinned node is not a valid answer.
+
+51
+00:04:15,162 --> 00:04:18,165
+Before you open the lab, three questions.
+
+52
+00:04:18,706 --> 00:04:23,844
+One: after the first split, why do we cut A B C next, and not D E?
+
+53
+00:04:24,396 --> 00:04:28,623
+Two: why does the cut jump from eight to thirteen when we split D E?
+
+54
+00:04:29,175 --> 00:04:34,456
+Three: if you wanted exactly three parts, where would you stop, and what would the cut be?
+
+55
+00:04:35,008 --> 00:04:38,727
+Answer those without scrolling back, and you have the idea.
+
+56
+00:04:39,378 --> 00:04:40,506
+Your turn.
+
+57
+00:04:41,047 --> 00:04:43,542
+The lab is linked right under this clip.
+
+58
+00:04:44,081 --> 00:04:52,266
+Load the starter graph, press the Run k equals three button, then the Run k equals four button, and watch the history fill in.
+
+59
+00:04:52,805 --> 00:04:56,120
+Work the challenge cards until Check turns them green.
+
+60
+00:04:56,659 --> 00:05:01,107
+Do one track on the checklist: the browser lab, or the coding track.
+
+61
+00:05:01,646 --> 00:05:03,790
+Do both, if you have time.
+
+62
+00:05:04,328 --> 00:05:11,107
+Then do the short quiz, and in the next lesson we stop splitting one part at a time and go straight to k parts.
